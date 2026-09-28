@@ -78,9 +78,35 @@ describe('parseNameString', () => {
       const result = parse('John Smith,')
       expect(result.names).to.deep.equal(['John Smith'])
     })
+
+    describe('preserveCase', () => {
+      for (const name of ['ARD', 'WDR 5', 'JOHN SMITH', 'e. e. cummings', 'McDonald']) {
+        it(`preserves the original spelling of ${name}`, () => {
+          expect(parse(name, { preserveCase: true }).names).to.deep.equal([name])
+        })
+      }
+
+      for (const separator of [', ', '; ', ' & ', ' and ']) {
+        it(`preserves case when splitting names with ${JSON.stringify(separator)}`, () => {
+          expect(parse(`JOHN SMITH${separator}JANE DOE`, { preserveCase: true }).names).to.deep.equal(['JOHN SMITH', 'JANE DOE'])
+        })
+      }
+
+      it('continues to reorder Last, First names and remove duplicates', () => {
+        expect(parse('SMITH, JOHN, DOE, JANE, SMITH, JOHN', { preserveCase: true }).names).to.deep.equal(['JOHN SMITH', 'JANE DOE'])
+      })
+
+      it('keeps automatic case correction for callers that do not opt in', () => {
+        expect(parse('JOHN SMITH').names).to.deep.equal(['John Smith'])
+      })
+    })
   })
 
   describe('nameToLastFirst', () => {
+    it('keeps the existing case correction for author sorting', () => {
+      expect(nameToLastFirst('JOHN SMITH')).to.equal('Smith, John')
+    })
+
     it('converts First Last to Last, First format', () => {
       const result = nameToLastFirst('John Smith')
       expect(result).to.equal('Smith, John')

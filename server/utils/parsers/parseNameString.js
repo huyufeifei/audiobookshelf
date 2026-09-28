@@ -5,8 +5,8 @@
 //
 const parseFullName = require('./parseFullName')
 
-function parseName(name) {
-  var parts = parseFullName(name)
+function parseName(name, preserveCase = false) {
+  var parts = parseFullName(name, undefined, preserveCase ? false : undefined)
   var firstName = parts.first
   if (firstName && parts.middle) firstName += ' ' + parts.middle
 
@@ -39,9 +39,10 @@ module.exports.nameToLastFirst = (firstLast) => {
  * Parses a name string into an array of names
  *
  * @param {string} nameString - The name string to parse
+ * @param {{ preserveCase?: boolean }} [options] Preserve metadata spelling instead of automatically correcting case
  * @returns {{ names: string[] }} Array of names
  */
-module.exports.parse = (nameString) => {
+module.exports.parse = (nameString, { preserveCase = false } = {}) => {
   if (!nameString) return null
 
   let splitNames = []
@@ -70,7 +71,7 @@ module.exports.parse = (nameString) => {
 
   // 1 name FIRST LAST
   if (splitNames.length === 1) {
-    names.push(parseName(nameString))
+    names.push(parseName(nameString, preserveCase))
   } else {
     // Determines whether this is formatted as last, first or first last (only if using comma separator)
     // Example: "Smith; James Jones" -> ["Smith", "James Jones"]
@@ -93,7 +94,7 @@ module.exports.parse = (nameString) => {
       }
     } else {
       splitNames.forEach((segment) => {
-        names.push(parseName(segment))
+        names.push(parseName(segment, preserveCase))
       })
     }
   }

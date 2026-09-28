@@ -290,7 +290,7 @@ class AudioFileScanner {
         if (mapping.key === 'narrators') {
           bookMetadata.narrators = parseNameString.parse(value)?.names || []
         } else if (mapping.key === 'authors') {
-          bookMetadata.authors = parseNameString.parse(value)?.names || []
+          bookMetadata.authors = parseNameString.parse(value, { preserveCase: true })?.names || []
         } else if (mapping.key === 'genres') {
           bookMetadata.genres = this.parseGenresString(value)
         } else if (mapping.key === 'series') {
